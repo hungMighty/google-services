@@ -72,6 +72,7 @@ class ViewController: UIViewController, GIDSignInUIDelegate {
 
   // [START toggle_auth]
   func toggleAuthUI() {
+    // MARK: - Check if already signed in
     if GIDSignIn.sharedInstance().hasAuthInKeychain() {
       // Signed in
       signInButton.isHidden = true

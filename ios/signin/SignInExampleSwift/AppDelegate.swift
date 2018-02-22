@@ -15,6 +15,7 @@
 //
 import UIKit
 import GoogleSignIn
+import Alamofire
 
 @UIApplicationMain
 // [START appdelegate_interfaces]
@@ -27,7 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
   func application(_ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
       // Initialize sign-in
-      GIDSignIn.sharedInstance().clientID = "YOUR_CLIENT_ID"
+      GIDSignIn.sharedInstance().clientID = "878905341633-pibbmo5f7tdjj78uqqokjokgrmdlep0k.apps.googleusercontent.com"
       GIDSignIn.sharedInstance().delegate = self
 
       return true
@@ -61,8 +62,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
         // [END_EXCLUDE]
       } else {
         // Perform any operations on signed in user here.
+        
+        // Don't send this id since it can be faked
         let userId = user.userID                  // For client-side use only!
+        print("User ID: \(userId)")
+        
+        // MARK: - Secure id - send this for the server to store
         let idToken = user.authentication.idToken // Safe to send to the server
+        print("User ID Token: \(idToken)")
+        
+        
+        
+        // MARK: Verify with the server if this id token is authentic
+        if idToken != nil {
+            Alamofire.request(NetworkRouter.tokenInfo(idToken!)).responseJSON(completionHandler: { (response) in
+                guard response.result.isSuccess else {
+                    print("Error: \(response.result.error?.localizedDescription ?? "")")
+                    return
+                }
+                
+                guard let responseJSON = response.result.value as? [String: Any],
+                    let email = responseJSON["email"] as? String,
+                    let emailVerifyStatus = responseJSON["email_verified"] as? String else {
+                        return
+                }
+                
+                print("Cur User email: \(email)")
+                print("Cur User email verify status: \(emailVerifyStatus)")
+            })
+        }
+        
+        
         let fullName = user.profile.name
         let givenName = user.profile.givenName
         let familyName = user.profile.familyName
