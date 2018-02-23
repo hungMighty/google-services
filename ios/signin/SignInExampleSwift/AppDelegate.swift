@@ -98,11 +98,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
         let familyName = user.profile.familyName
         let email = user.profile.email
         // [START_EXCLUDE]
-        NotificationCenter.default.post(
-          name: Notification.Name(rawValue: "ToggleAuthUINotification"),
-          object: nil,
-          userInfo: ["statusText": "Signed in user:\n\(fullName)"])
-        // [END_EXCLUDE]
+        
+        if fullName != nil {
+            NotificationCenter.default.post(
+                name: Notification.Name(rawValue: "ToggleAuthUINotification"),
+                object: nil,
+                userInfo: ["statusText": "Signed in user:\n\(fullName!)"])
+            // [END_EXCLUDE]
+        }
       }
   }
   // [END signin_handler]
